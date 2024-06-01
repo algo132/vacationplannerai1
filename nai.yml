@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: vacation-planner
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn -b 0.0.0.0:10000 main:app"
+    autoDeploy: true
+    repo: https://github.com/yourusername/my-dynamic-website

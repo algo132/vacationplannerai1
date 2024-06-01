@@ -1,0 +1,7 @@
+Flask==2.0.1
+gunicorn==20.1.0
+pandas==1.2.4
+stripe==2.56.0
+amadeus==5.0.0
+
+

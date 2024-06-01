@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vacation Planner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        async function getRecommendations() {
+            const response = await fetch('/recommend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+            document.getElementById('results').innerText = JSON.stringify(data, null, 2);
+        }
+
+        async function searchFlights() {
+            const origin = document.getElementById('origin').value;
+            const destination = document.getElementById('destination').value;
+            const departure_date = document.getElementById('departure_date').value;
+
+            const response = await fetch('/search_flights', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ origin, destination, departure_date })
+            });
+
+            const data = await response.json();
+            document.getElementById('flight_results').innerText = JSON.stringify(data, null, 2);
+        }
+
+        async function searchHotels() {
+            const city_code = document.getElementById('city_code').value;
+            const check_in_date = document.getElementById('check_in_date').value;
+            const check_out_date = document.getElementById('check_out_date').value;
+
+            const response = await fetch('/search_hotels', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ city_code, check_in_date, check_out_date })
+            });
+
+            const data = await response.json();
+            document.getElementById('hotel_results').innerText = JSON.stringify(data, null, 2);
+        }
+
+        async function bookVacation(destination) {
+            const response = await fetch('/book', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ destination })
+            });
+
+            const data = await response.json();
+            const stripe = Stripe('your_stripe_public_key');
+            stripe.redirectToCheckout({ sessionId: data.id });
+        }
+    </script>
+</head>
+<body>
+    <h1>Vacation Planner</h1>
+    <button onclick="getRecommendations()">Get Recommendations</button>
+    <pre id="results"></pre>
+
+    <h2>Search Flights</h2>
+    <input type="text" id="origin" placeholder="Origin">
+    <input type="text" id="destination" placeholder="Destination">
+    <input type="date" id="departure_date" placeholder="Departure Date">
+    <button onclick="searchFlights()">Search Flights</button>
+    <pre id="flight_results"></pre>
+
+    <h2>Search Hotels</h2>
+    <input type="text" id="city_code" placeholder="City Code">
+    <input type="date" id="check_in_date" placeholder="Check-in Date">
+    <input type="date" id="check_out_date" placeholder="Check-out Date">
+    <button onclick="searchHotels()">Search Hotels</button>
+    <pre id="hotel_results"></pre>
+
+    <h2>Book a Vacation</h2>
+    <input type="text" id="book_destination" placeholder="Destination">
+    <button onclick="bookVacation(document.getElementById('book_destination').value)">Book Now</button>
+</body>
+</html>
+
